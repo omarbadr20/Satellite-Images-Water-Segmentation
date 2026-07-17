@@ -2,13 +2,12 @@
 
 ---
 
-## Task 1: Understanding the Dataset Structure
+## Dataset Structure
 
 The dataset comprises harmonized satellite tiles paired with corresponding binary ground-truth labels. The structural parameters of this dataset layout are defined as follows:
 
 * **Spatial and Ground Resolution:** 
-  * **Patch Size:** $512 \times 512$ pixels.
-  * **Ground Sampling Distance (GSD):** $30\text{ m}$ per pixel. Each patch covers a spatial footprint of approximately $15.36\text{ km} \times 15.36\text{ km}$ (a total area of $\approx 235.9\text{ km}^2$).
+  * **Patch Size:** $128 \times 128$ pixels.
 * **Format:** 
   * **Images:** Multichannel `.tif` (TIFF) format containing 12 coincident spectral, elevation, and probability layers.
   * **Labels:** Companion `.png` files containing binary masks where background/land is encoded as `0` and water bodies are encoded as `1` (or `255`, mapped to `1` during preprocessing).
@@ -33,7 +32,7 @@ Rather than relying solely on visible light (RGB), this dataset appends physical
 
 ---
 
-## Task 2: In-Depth Band-by-Band Visual Analysis
+Band-by-Band Visual Example
 
 The visual outputs generated from the 12-band sample slice reveal a large river running horizontally through the scene. Examining each band cohort normalized to $[0.0, 1.0]$ illustrates the distinct information provided by each sensor group:
 
@@ -52,7 +51,7 @@ The visual outputs generated from the 12-band sample slice reveal a large river 
 ### 4. Topographical Layers (Merit DEM and Copernicus DEM)
 * **Visual Signature:** The river channel is visible as a deep, low-elevation depression (dark purple) slicing through the surrounding higher-elevation green/yellow terrain.
 * **Analysis:** 
-  * **Merit DEM** exhibits a coarser, blockier pattern because of its generalized, regional vertical smoothing.
+  * **Merit DEM** exhibits a coarser pattern because of its generalized, regional vertical smoothing.
   * **Copernicus DEM** displays much higher localized resolution, highlighting fine-scale drainage channels, embankments, and topographic changes. Since water gathers at the local minimum elevation, these layers prevent models from misidentifying dark mountain shadows as water.
 
 ### 5. Derived and Historical Priors (ESA World Cover & Water Occurrence Probability)
