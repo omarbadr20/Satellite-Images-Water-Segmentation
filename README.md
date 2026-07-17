@@ -1,5 +1,4 @@
-# Multispectral Water Body Segmentation: Structural Analysis and Band Visualization
-
+# Multispectral Water Body Segmentation
 ---
 
 ## Dataset Structure
@@ -18,17 +17,17 @@ Rather than relying solely on visible light (RGB), this dataset appends physical
 | Channel Index | Band Name | Spectral / Data Range | Primary Function in Water Detection |
 | :---: | :--- | :--- | :--- |
 | **1** | Coastal Aerosol | $\sim 430\text{–}450\text{ nm}$ | High sensitivity to aerosols and suspended river sediment; corrects atmospheric scattering. |
-| **2** | Blue | $\sim 450\text{–}510\text{ nm}$ | Penetrates water columns; useful for bathymetry and identifying clear shallow water. |
-| **3** | Green | $\sim 530\text{–}590\text{ nm}$ | High reflectance over turbid, algae-rich, or sediment-heavy waters. |
-| **4** | Red | $\sim 640\text{–}670\text{ nm}$ | Boundary channel; transition point where water absorption begins to escalate. |
+| **2** | Blue | $\sim 450\text{–}510\text{ nm}$ | Penetrates water columns; useful for identifying clear shallow water. |
+| **3** | Green | $\sim 530\text{–}590\text{ nm}$ | High reflectance over algae, or sediment-heavy waters. |
+| **4** | Red | $\sim 640\text{–}670\text{ nm}$ | Helps inBoundary Visualization; creating a transition point where water absorption begins to increase. |
 | **5** | NIR (Near-Infrared) | $\sim 850\text{–}880\text{ nm}$ | Strongly absorbed by water; highly reflected by vegetation. Creates a stark land-water boundary. |
 | **6** | SWIR 1 | $\sim 1570\text{–}1650\text{ nm}$ | Strong absorption by moisture; highly effective for distinguishing wet soils from open water. |
 | **7** | SWIR 2 | $\sim 2110\text{–}2290\text{ nm}$ | Peak water absorption; crucial for separating shallow shorelines from muddy shore banks. |
-| **8** | QA Band | Discrete Flags | Identifies anomalous pixels (cloud, cloud shadow, snow, detector saturation). |
-| **9** | Merit DEM | Elevation (m) | Global topographic model; constrains water to low-lying, hydrologically sound basins. |
-| **10** | Copernicus DEM | Elevation (m) | High-accuracy local surface model; provides local slope and drainage directions. |
+| **8** | QA Band | Discrete Flags | Identifies anomaly pixels (cloud, cloud shadow, snow). |
+| **9** | Merit DEM | Elevation (m) | Global topographic model; constrains water to low-lying basins. |
+| **10** | Copernicus DEM | Elevation (m) | High-accuracy local surface model; provides local slope directions. |
 | **11** | ESA World Cover | Categorical Land Cover | Provides global thematic classification priors (e.g., forest, urban, agricultural, water). |
-| **12** | Water Occur. Prob. | Probability ($0\text{–}100\%$) | Historical surface water presence probability maps, stabilizing seasonal variance. |
+| **12** | Water Occur. Prob. | Probability ($0\text{–}100\%$) | Historical surface water presence probability maps |
 
 ---
 
