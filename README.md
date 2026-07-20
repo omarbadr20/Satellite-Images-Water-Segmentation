@@ -1,66 +1,101 @@
-# Multispectral Water Body Segmentation
----
+#  Satellite Images Water Segmentation
 
-## Dataset Structure
+A deep learning pipeline built in PyTorch for high-precision water body segmentation using multi-spectral satellite imagery. This project processes 12-band GeoTIFF images to train and evaluate a segmentation model, tracking performance across various learning rates to optimize precision, recall, F1-Score, and Intersection over Union (IoU).
 
-The dataset comprises harmonized satellite tiles paired with corresponding binary ground-truth labels. The structural parameters of this dataset layout are defined as follows:
+## Dataset
 
-* **Spatial and Ground Resolution:** 
-  * **Patch Size:** $128 \times 128$ pixels.
-* **Format:** 
-  * **Images:** Multichannel `.tif` (TIFF) format containing 12 coincident spectral, elevation, and probability layers.
-  * **Labels:** Companion `.png` files containing binary masks where background/land is encoded as `0` and water bodies are encoded as `1` (or `255`, mapped to `1` during preprocessing).
+The dataset consists of multi-channel GeoTIFF images (`.tif`), each containing 12 distinct bands encompassing spectral reflectance, digital elevation models (DEM), and quality assessment data.
 
-### The 12-Channel Band Layout
-Rather than relying solely on visible light (RGB), this dataset appends physical, environmental, and historical layers into a unified 12-channel stack:
+### Image Specifications
+*   **Dimensions:** All input images are uniformly pre-processed to a strict `(12, 128, 128)` dimensional shape.
+*   **Data Type:** `float32`.
 
-| Channel Index | Band Name | Spectral / Data Range | Primary Function in Water Detection |
-| :---: | :--- | :--- | :--- |
-| **1** | Coastal Aerosol | $\sim 430\text{–}450\text{ nm}$ | High sensitivity to aerosols and suspended river sediment; corrects atmospheric scattering. |
-| **2** | Blue | $\sim 450\text{–}510\text{ nm}$ | Penetrates water columns; useful for identifying clear shallow water. |
-| **3** | Green | $\sim 530\text{–}590\text{ nm}$ | High reflectance over algae, or sediment-heavy waters. |
-| **4** | Red | $\sim 640\text{–}670\text{ nm}$ | Helps inBoundary Visualization; creating a transition point where water absorption begins to increase. |
-| **5** | NIR (Near-Infrared) | $\sim 850\text{–}880\text{ nm}$ | Strongly absorbed by water; highly reflected by vegetation. Creates a stark land-water boundary. |
-| **6** | SWIR 1 | $\sim 1570\text{–}1650\text{ nm}$ | Strong absorption by moisture; highly effective for distinguishing wet soils from open water. |
-| **7** | SWIR 2 | $\sim 2110\text{–}2290\text{ nm}$ | Peak water absorption; crucial for separating shallow shorelines from muddy shore banks. |
-| **8** | QA Band | Discrete Flags | Identifies anomaly pixels (cloud, cloud shadow, snow). |
-| **9** | Merit DEM | Elevation (m) | Global topographic model; constrains water to low-lying basins. |
-| **10** | Copernicus DEM | Elevation (m) | High-accuracy local surface model; provides local slope directions. |
-| **11** | ESA World Cover | Categorical Land Cover | Provides global thematic classification priors (e.g., forest, urban, agricultural, water). |
-| **12** | Water Occur. Prob. | Probability ($0\text{–}100\%$) | Historical surface water presence probability maps |
+### The 12 Channels Include
+1. Coastal Aerosol
+2. Blue
+3. Green
+4. Red
+5. Near-Infrared (NIR)
+6. Shortwave Infrared 1 (SWIR 1)
+7. Shortwave Infrared 2 (SWIR 2)
+8. QA Band
+9. Merit DEM
+10. Copernicus DEM
+11. ESA World Cover
+12. Water Occurrence Probability
+
+> **Note:** Raw satellite values can contain negative values (e.g., Coastal Aerosol and Blue bands), which are preserved in the raw matrices but normalized dynamically for visual rendering.
 
 ---
 
-Band-by-Band Visual Example
+## Installation & Requirements
 
-The visual outputs generated from the 12-band sample slice reveal a large river running horizontally through the scene. Examining each band cohort normalized to $[0.0, 1.0]$ illustrates the distinct information provided by each sensor group:
+Ensure you have Python 3.12+ installed. Clone this repository and install the required dependencies:
 
-### 1. Visible Bands (Coastal Aerosol, Blue, Green, Red)
-* **Visual Signature:** The river channel appears as a dark, low-contrast band relative to the surrounding land features.
-* **Analysis:** Because visible light partially reflects off suspended sediment and the river bottom, water does not appear completely black here. The surrounding land shows complex, heterogeneous agricultural field patterns. The green and red bands exhibit high variance over land due to different vegetation stages and soil types, which can occasionally confuse simple classification models.
+```bash
+git clone https://github.com/your-username/water-segmentation.git
+cd water-segmentation
+pip install -r requirements.txt
+```
 
-### 2. Infrared Bands (NIR, SWIR 1, SWIR 2)
-* **Visual Signature:** The river channel transitions into a sharp, uniformly dark purple stripe ($0.0$ reflectance), contrasting against the highly reflective yellow and green land features.
-* **Analysis:** Since water molecules strongly absorb electromagnetic radiation in the infrared wavelengths, the river acts as a near-perfect energy sink. NIR is highly sensitive to leaf structure (making healthy vegetation bright), while SWIR bands are sensitive to soil moisture. Together, they create a high-contrast boundary at the land-water interface.
-
-### 3. Quality Assessment (QA Band)
-* **Visual Signature:** A blocky, semi-discrete thematic visualization showing uniform values with isolated anomalies.
-* **Analysis:** This layer serves as a mask to notify the model of obscured pixels. In this sample, the uniform values signify clear sky conditions, while the tiny bright pixel near the lower center indicates a minor localized artifact or sensor anomaly.
-
-### 4. Topographical Layers (Merit DEM and Copernicus DEM)
-* **Visual Signature:** The river channel is visible as a deep, low-elevation depression (dark purple) slicing through the surrounding higher-elevation green/yellow terrain.
-* **Analysis:** 
-  * **Merit DEM** exhibits a coarser pattern because of its generalized, regional vertical smoothing.
-  * **Copernicus DEM** displays much higher localized resolution, highlighting fine-scale drainage channels, embankments, and topographic changes. Since water gathers at the local minimum elevation, these layers prevent models from misidentifying dark mountain shadows as water.
-
-### 5. Derived and Historical Priors (ESA World Cover & Water Occurrence Probability)
-* **Visual Signature:**
-  * **ESA World Cover:** Displays a bright yellow, highly distinct classification band mapping directly to the river's path, set against dark purple background land-cover classes.
-  * **Water Occurrence Probability:** A sharp, continuous yellow stripe indicating a near-$100\%$ ($1.0$) historic water occurrence rate.
-* **Analysis:** These channels act as historical and context-based priors. While the spectral bands vary dynamically due to weather, seasonal flooding, or turbidity, these auxiliary layers anchor the neural network's predictions using long-term global observation data.
+### Core Dependencies
+*   `torch` (PyTorch)
+*   `tifffile`
+*   `numpy`
+*   `matplotlib`
+*   `opencv-python` (`cv2`)
+*   `scikit-learn`
 
 ---
 
-### Normalized Band Visualization
+##  Usage
 
-![Figure 1: Normalized 12-band visualization showing the distinct visual signatures of the river and surrounding terrain across optical, infrared, topographic, and thematic bands.](images/image_bands.png)
+### 1. Data Visualization
+To inspect the 12 individual bands of a specific `.tif` sample, a visualization function is provided. It automatically applies Min-Max scaling to handle the high dynamic ranges of satellite bit-depths and displays them in a 3x4 grid.
+
+```python
+from utils import visualize_12_bands
+
+# Visualize a single sample
+visualize_12_bands("data/images/105.tif")
+```
+
+### 2. Training the Model
+Run the main Jupyter Notebook (`water_segmentation.ipynb`) or the extracted Python script to initialize the training loop.
+
+The pipeline includes automatic dataset splitting (`train_test_split`) and loads data via PyTorch `DataLoader`.
+
+---
+
+## 📈 Training Metrics & Evaluation
+
+The model was evaluated over 150 epochs using different learning rates to test stability and convergence. The following metrics were monitored:
+*   Loss (Training vs. Validation)
+*   Precision & Recall
+*   F1-Score
+*   IoU (Intersection over Union)
+
+### Learning Rate Comparisons
+*   **LR = 1e-5:** Demonstrates highly stable and uniform convergence. The training and validation curves track closely together, showcasing excellent generalization with minimal overfitting.
+*   **LR = 1e-4:** Exhibits significantly faster initial optimization, reaching high performance benchmarks earlier in the training lifecycle, though with higher early-epoch volatility.
+
+### Visual Results
+
+| Learning Rate: 1e-5 | Learning Rate: 1e-4 |
+| :---: | :---: |
+| ![Metrics 1e-5](/images/Metrics_1e-5.png) | ![Metrics 1e-4](/images/Metrics_1e-4.png) |
+
+---
+
+## Repository Structure
+
+```plaintext
+├── data/
+│   ├── images/              # 12-channel .tif images
+│   └── masks/               # Corresponding binary water masks
+├── notebooks/
+│   └── water_segmentation.ipynb  # Main training and evaluation notebook
+├── src/                     # Modularized Python scripts
+├── requirements.txt         # Python dependencies
+└── README.md                # Project documentation
+```
