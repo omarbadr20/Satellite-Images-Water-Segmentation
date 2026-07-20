@@ -33,9 +33,7 @@ The dataset consists of multi-channel GeoTIFF images (`.tif`), each containing 1
 Ensure you have Python 3.12+ installed. Clone this repository and install the required dependencies:
 
 ```bash
-git clone https://github.com/your-username/water-segmentation.git
-cd water-segmentation
-pip install -r requirements.txt
+git clone https://github.com/omarbadr20/water-segmentation.git
 ```
 
 ### Core Dependencies
@@ -52,13 +50,6 @@ pip install -r requirements.txt
 
 ### 1. Data Visualization
 To inspect the 12 individual bands of a specific `.tif` sample, a visualization function is provided. It automatically applies Min-Max scaling to handle the high dynamic ranges of satellite bit-depths and displays them in a 3x4 grid.
-
-```python
-from utils import visualize_12_bands
-
-# Visualize a single sample
-visualize_12_bands("data/images/105.tif")
-```
 
 ![Band_representation](/images/image_bands.png)
 
