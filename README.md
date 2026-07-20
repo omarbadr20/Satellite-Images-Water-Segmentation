@@ -88,16 +88,3 @@ The model was evaluated over 150 epochs using different learning rates to test s
 | ![Metrics 1e-5](/images/Metrics_1e-5.png) | ![Metrics 1e-4](/images/Metrics_1e-4.png) |
 
 ---
-
-## Repository Structure
-
-```plaintext
-├── data/
-│   ├── images/              # 12-channel .tif images
-│   └── masks/               # Corresponding binary water masks
-├── notebooks/
-│   └── water_segmentation.ipynb  # Main training and evaluation notebook
-├── src/                     # Modularized Python scripts
-├── requirements.txt         # Python dependencies
-└── README.md                # Project documentation
-```
