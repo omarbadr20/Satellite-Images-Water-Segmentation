@@ -69,7 +69,7 @@ The pipeline includes automatic dataset splitting (`train_test_split`) and loads
 
 ---
 
-## 📈 Training Metrics & Evaluation
+## Training Metrics & Evaluation
 
 The model was evaluated over 150 epochs using different learning rates to test stability and convergence. The following metrics were monitored:
 *   Loss (Training vs. Validation)
