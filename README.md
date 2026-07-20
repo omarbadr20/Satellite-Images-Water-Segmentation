@@ -60,7 +60,7 @@ from utils import visualize_12_bands
 visualize_12_bands("data/images/105.tif")
 ```
 
-| ![Band_representation](/images/image_bands.png)
+![Band_representation](/images/image_bands.png)
 
 ### 2. Training the Model
 Run the main Jupyter Notebook (`water_segmentation.ipynb`) or the extracted Python script to initialize the training loop.
